@@ -12,31 +12,33 @@ export class TreatmentsService {
   ) {}
 
   async create(createTreatmentDto: any): Promise<Treatment> {
-    // 1. Validamos si incluye vacuna
-    if (createTreatmentDto.vacuna_usada) {
-      if (!createTreatmentDto.cantidad || createTreatmentDto.cantidad <= 0) {
-        throw new BadRequestException('Si usa vacuna, debe especificar la cantidad');
-      }
+    const insumos = createTreatmentDto.vacunas_usadas || [];
 
-      // 2. Llamamos al servicio de vacunas para descontar stock
-      // Si no hay stock, el vaccinesService lanzará un error y detendrá el proceso aquí
-      await this.vaccinesService.decreaseStock(
-        createTreatmentDto.vacuna_usada,
-        createTreatmentDto.cantidad,
-      );
+    // 1. Validar y descontar stock para CADA vacuna en la lista
+    if (Array.isArray(insumos) && insumos.length > 0) {
+      // Usamos un bucle for-of para esperar a que cada promesa termine (secuencial)
+      for (const item of insumos) {
+        if (!item.vacuna_id || !item.cantidad) {
+           throw new BadRequestException('Datos de insumos incompletos');
+        }
+        // Si no hay stock, decreaseStock lanzará excepción y detendrá todo el proceso
+        await this.vaccinesService.decreaseStock(item.vacuna_id, item.cantidad);
+      }
     }
 
-    // 3. Si todo salió bien (o no hubo vacuna), guardamos el tratamiento
+    // 2. Guardar el tratamiento
     const createdTreatment = new this.treatmentModel(createTreatmentDto);
     return createdTreatment.save();
   }
 
   async findAll(): Promise<Treatment[]> {
-    // Usamos populate para ver los detalles de la mascota y la vacuna (si la hay)
     return this.treatmentModel
       .find()
       .populate('mascota_id')
-      .populate('vacuna_usada')
+      .populate({
+        path: 'vacunas_usadas.vacuna_id',
+        model: 'Vaccine' // <--- Esto es clave cuando está dentro de un array
+      })
       .exec();
   }
   

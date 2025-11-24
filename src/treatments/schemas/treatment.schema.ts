@@ -5,6 +5,17 @@ import { Vaccine } from '../../vaccines/schemas/vaccine.schema';
 
 export type TreatmentDocument = HydratedDocument<Treatment>;
 
+// 1. Definimos un sub-esquema para los items del array
+@Schema({ _id: false }) // No necesitamos ID para estos sub-objetos
+class TreatmentItem {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vaccine', required: true })
+  vacuna_id: Vaccine;
+
+  @Prop({ required: true, min: 1 })
+  cantidad: number;
+}
+const TreatmentItemSchema = SchemaFactory.createForClass(TreatmentItem);
+
 @Schema()
 export class Treatment {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Pet', required: true })
@@ -14,7 +25,7 @@ export class Treatment {
   fecha: Date;
 
   @Prop({ required: true })
-  tipo: string; // Ej: 'Vacunación', 'Consulta'
+  tipo: string; 
 
   @Prop()
   notas: string;
@@ -22,12 +33,8 @@ export class Treatment {
   @Prop({ required: true })
   costo: number;
 
-  // Relación opcional con Vacuna
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vaccine' })
-  vacuna_usada: Vaccine;
-
-  @Prop()
-  cantidad: number; // Dosis a descontar
+  @Prop({ type: [TreatmentItemSchema], default: [] })
+  vacunas_usadas: TreatmentItem[];
 }
 
 export const TreatmentSchema = SchemaFactory.createForClass(Treatment);

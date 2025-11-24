@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'; // Agregamos Put y Delete
 import { VaccinesService } from './vaccines.service';
 
 @Controller('vaccines')
@@ -18,5 +18,15 @@ export class VaccinesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.vaccinesService.findOne(id);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateVaccineDto: any) {
+    return this.vaccinesService.update(id, updateVaccineDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.vaccinesService.remove(id);
   }
 }

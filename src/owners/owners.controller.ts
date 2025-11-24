@@ -1,18 +1,34 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put } from '@nestjs/common';
 import { OwnersService } from './owners.service';
 
-@Controller('owners') // La ruta será http://localhost:3000/owners
+@Controller('owners')
 export class OwnersController {
   constructor(private readonly ownersService: OwnersService) {}
 
   @Post()
-  async create(@Body() createOwnerDto: any) {
-    // Recibe los datos del frontend (o Postman) y llama al servicio
+  create(@Body() createOwnerDto: any) {
     return this.ownersService.create(createOwnerDto);
   }
 
   @Get()
-  async findAll() {
+  findAll() {
     return this.ownersService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.ownersService.findOne(id);
+  }
+
+  // Endpoint para Editar
+  @Put(':id') 
+  update(@Param('id') id: string, @Body() updateOwnerDto: any) {
+    return this.ownersService.update(id, updateOwnerDto);
+  }
+
+  // Endpoint para Eliminar
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.ownersService.remove(id);
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Vaccine } from './schemas/vaccine.schema'; // Asegúrate que la ruta sea correcta
+import { Vaccine } from './schemas/vaccine.schema';
 
 @Injectable()
 export class VaccinesService {
@@ -9,26 +9,44 @@ export class VaccinesService {
     @InjectModel(Vaccine.name) private vaccineModel: Model<Vaccine>,
   ) {}
 
-  // 1. Crear Vacuna (Para llenar el inventario inicial)
+  // Crear
   async create(createVaccineDto: any): Promise<Vaccine> {
     const createdVaccine = new this.vaccineModel(createVaccineDto);
     return createdVaccine.save();
   }
 
-  // 2. Listar todas (Para ver el stock actual)
+  // Listar
   async findAll(): Promise<Vaccine[]> {
     return this.vaccineModel.find().exec();
   }
 
-  // 3. Buscar una por ID (Útil para validaciones)
+  // Buscar uno
   async findOne(id: string): Promise<Vaccine> {
     const vaccine = await this.vaccineModel.findById(id).exec();
     if (!vaccine) throw new NotFoundException('Vacuna no encontrada');
     return vaccine;
   }
 
-  // 4. MÉTODO CLAVE: Descontar Stock
-  // Este método será llamado por el TreatmentsService
+  // --- NUEVOS MÉTODOS ---
+  
+  // Editar (Para ajustar stock manual o corregir nombre)
+  async update(id: string, updateVaccineDto: any): Promise<Vaccine> {
+    const updatedVaccine = await this.vaccineModel
+      .findByIdAndUpdate(id, updateVaccineDto, { new: true })
+      .exec();
+      
+    if (!updatedVaccine) throw new NotFoundException('Vacuna no encontrada');
+    return updatedVaccine;
+  }
+
+  // Eliminar
+  async remove(id: string): Promise<Vaccine> {
+    const deletedVaccine = await this.vaccineModel.findByIdAndDelete(id).exec();
+    if (!deletedVaccine) throw new NotFoundException('Vacuna no encontrada');
+    return deletedVaccine;
+  }
+
+  // Lógica de negocio: Descontar Stock (Usado por Tratamientos)
   async decreaseStock(id: string, cantidad: number): Promise<Vaccine> {
     const vaccine = await this.vaccineModel.findById(id);
     
