@@ -9,15 +9,13 @@ export class AppointmentsService {
     @InjectModel(Appointment.name) private appointmentModel: Model<Appointment>,
   ) {}
 
-  // --- Helper Mejorado: Acepta 'excludeId' para evitar chocar consigo mismo ---
   private async validarDisponibilidad(veterinario: string, fecha: Date | string, excludeId?: string) {
     const query: any = {
       veterinario,
       fecha, 
-      estado: { $ne: 'cancelada' }, // Ignoramos las canceladas
+      estado: { $ne: 'cancelada' },
     };
 
-    // Si nos pasan un ID, le decimos a Mongo: "Busca cualquiera MENOS este ID"
     if (excludeId) {
       query._id = { $ne: excludeId };
     }
@@ -32,7 +30,6 @@ export class AppointmentsService {
   }
 
   async create(createAppointmentDto: any): Promise<Appointment> {
-    // Validación normal (sin excluir nada porque es nueva)
     await this.validarDisponibilidad(
       createAppointmentDto.veterinario, 
       createAppointmentDto.fecha
@@ -54,28 +51,24 @@ export class AppointmentsService {
     return appointment;
   }
 
-  // --- REPROGRAMAR (UPDATE) ---
   async update(id: string, updateAppointmentDto: any): Promise<Appointment> {
     const citaActual = await this.appointmentModel.findById(id);
     if (!citaActual) throw new NotFoundException('Cita no encontrada');
 
-    // Solo validamos choque si cambiaron la fecha o el veterinario
     if (updateAppointmentDto.fecha || updateAppointmentDto.veterinario) {
         const nuevoVet = updateAppointmentDto.veterinario || citaActual.veterinario;
         const nuevaFecha = updateAppointmentDto.fecha || citaActual.fecha;
         
-        // ¡IMPORTANTE! Pasamos 'id' como tercer parámetro para excluirla del choque
         await this.validarDisponibilidad(nuevoVet, nuevaFecha, id);
     }
 
     return this.appointmentModel.findByIdAndUpdate(
       id, 
       updateAppointmentDto, 
-      { new: true } // Devuelve el objeto ya actualizado
+      { new: true }
     ).exec();
   }
 
-  // --- CANCELAR ---
   async cancel(id: string): Promise<Appointment> {
     const citaCancelada = await this.appointmentModel.findByIdAndUpdate(
         id, 
@@ -91,20 +84,18 @@ export class AppointmentsService {
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
 
-    // 1. Construimos el filtro base dinámicamente
     const matchFilter: any = {
       fecha: { $gte: hoy },
       estado: { $ne: 'cancelada' },
     };
 
-    // Si nos enviaron un nombre, lo agregamos al filtro
     if (veterinarianName) {
       matchFilter.veterinario = veterinarianName;
     }
 
     return this.appointmentModel.aggregate([
       {
-        $match: matchFilter, // Usamos el filtro dinámico aquí
+        $match: matchFilter,
       },
       {
         $lookup: {

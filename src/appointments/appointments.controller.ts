@@ -5,10 +5,8 @@ import { AppointmentsService } from './appointments.service';
 export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
-  // --- Endpoint de Reporte ---
   @Get('reports/upcoming')
   getUpcomingReport(@Query('veterinarian') veterinarian?: string) {
-    // Pasamos el parámetro (puede ser undefined si no lo envían)
     return this.appointmentsService.getUpcomingReport(veterinarian);
   }
 
@@ -27,13 +25,11 @@ export class AppointmentsController {
     return this.appointmentsService.findOne(id);
   }
 
-  // Reprogramar / Editar
   @Put(':id') 
   update(@Param('id') id: string, @Body() updateAppointmentDto: any) {
     return this.appointmentsService.update(id, updateAppointmentDto);
   }
 
-  // Cancelar específicamente
   @Patch(':id/cancel') 
   cancel(@Param('id') id: string) {
     return this.appointmentsService.cancel(id);

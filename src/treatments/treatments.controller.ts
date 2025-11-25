@@ -5,7 +5,6 @@ import { TreatmentsService } from './treatments.service';
 export class TreatmentsController {
   constructor(private readonly treatmentsService: TreatmentsService) {}
 
-  // --- Endpoint de Reporte de Gastos ---
   @Get('reports/expenses')
   getExpensesReport(@Query('petName') petName?: string) {
     return this.treatmentsService.getReporteGastos(petName);

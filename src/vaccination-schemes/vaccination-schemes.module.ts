@@ -10,6 +10,6 @@ import { VaccinationScheme, VaccinationSchemeSchema } from './schemas/vaccinatio
   ],
   controllers: [VaccinationSchemesController],
   providers: [VaccinationSchemesService],
-  exports: [VaccinationSchemesService, MongooseModule], // Exportamos para usarlo en Pets
+  exports: [VaccinationSchemesService, MongooseModule],
 })
 export class VaccinationSchemesModule {}

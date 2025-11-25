@@ -9,27 +9,21 @@ export class VaccinesService {
     @InjectModel(Vaccine.name) private vaccineModel: Model<Vaccine>,
   ) {}
 
-  // Crear
   async create(createVaccineDto: any): Promise<Vaccine> {
     const createdVaccine = new this.vaccineModel(createVaccineDto);
     return createdVaccine.save();
   }
 
-  // Listar
   async findAll(): Promise<Vaccine[]> {
     return this.vaccineModel.find().exec();
   }
 
-  // Buscar uno
   async findOne(id: string): Promise<Vaccine> {
     const vaccine = await this.vaccineModel.findById(id).exec();
     if (!vaccine) throw new NotFoundException('Vacuna no encontrada');
     return vaccine;
   }
 
-  // --- NUEVOS MÉTODOS ---
-  
-  // Editar (Para ajustar stock manual o corregir nombre)
   async update(id: string, updateVaccineDto: any): Promise<Vaccine> {
     const updatedVaccine = await this.vaccineModel
       .findByIdAndUpdate(id, updateVaccineDto, { new: true })
@@ -39,14 +33,12 @@ export class VaccinesService {
     return updatedVaccine;
   }
 
-  // Eliminar
   async remove(id: string): Promise<Vaccine> {
     const deletedVaccine = await this.vaccineModel.findByIdAndDelete(id).exec();
     if (!deletedVaccine) throw new NotFoundException('Vacuna no encontrada');
     return deletedVaccine;
   }
 
-  // Lógica de negocio: Descontar Stock (Usado por Tratamientos)
   async decreaseStock(id: string, cantidad: number): Promise<Vaccine> {
     const vaccine = await this.vaccineModel.findById(id);
     

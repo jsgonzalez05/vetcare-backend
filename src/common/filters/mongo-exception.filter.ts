@@ -11,13 +11,11 @@ export class MongoExceptionFilter implements ExceptionFilter {
     let error = 'Internal Server Error';
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    // Capturar ID inválido (CastError)
     if (exception instanceof Error.CastError) {
       status = HttpStatus.BAD_REQUEST;
       error = `El ID proporcionado no es válido: ${exception.value}`;
     }
     
-    // Capturar error de validación (campos requeridos faltantes)
     if (exception instanceof Error.ValidationError) {
       status = HttpStatus.BAD_REQUEST;
       error = 'Error de validación en los datos enviados';

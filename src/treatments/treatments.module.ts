@@ -7,9 +7,7 @@ import { VaccinesModule } from '../vaccines/vaccines.module'; // <--- 1. IMPORTA
 
 @Module({
   imports: [
-    // Registramos el Schema de Tratamientos
     MongooseModule.forFeature([{ name: Treatment.name, schema: TreatmentSchema }]),
-    // Importamos el módulo de vacunas para usar su servicio exportado
     VaccinesModule, 
   ],
   controllers: [TreatmentsController],

@@ -4,20 +4,19 @@ import { Vaccine } from '../../vaccines/schemas/vaccine.schema';
 
 export type VaccinationSchemeDocument = HydratedDocument<VaccinationScheme>;
 
-// Clase auxiliar para los detalles de cada vacuna dentro del esquema
-@Schema({ _id: false }) // No necesitamos ID para sub-documentos
+@Schema({ _id: false })
 export class SchemeDetail {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Vaccine', required: true })
-  vacuna_id: Vaccine; // Relación con la tabla Vacunas
+  vacuna_id: Vaccine;
 
   @Prop({ required: true })
-  edad_meses: number; // A qué edad se aplica (ej: 3 meses)
+  edad_meses: number;
 
   @Prop()
-  frecuencia_dias: number; // Cada cuánto se repite (ej: 365 días)
+  frecuencia_dias: number;
 
   @Prop()
-  notas: string; // Ej: "Refuerzo anual"
+  notas: string;
 }
 
 const SchemeDetailSchema = SchemaFactory.createForClass(SchemeDetail);
@@ -25,12 +24,11 @@ const SchemeDetailSchema = SchemaFactory.createForClass(SchemeDetail);
 @Schema()
 export class VaccinationScheme {
   @Prop({ required: true, unique: true })
-  especie: string; // Ej: "Perro", "Gato"
+  especie: string;
 
   @Prop({ required: true })
-  nombre_esquema: string; // Ej: "Esquema Básico Canino"
+  nombre_esquema: string;
 
-  // Array de vacunas requeridas
   @Prop({ type: [SchemeDetailSchema], required: true })
   vacunas_requeridas: SchemeDetail[];
 }

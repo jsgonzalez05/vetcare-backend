@@ -20,13 +20,11 @@ export class OwnersController {
     return this.ownersService.findOne(id);
   }
 
-  // Endpoint para Editar
   @Put(':id') 
   update(@Param('id') id: string, @Body() updateOwnerDto: any) {
     return this.ownersService.update(id, updateOwnerDto);
   }
 
-  // Endpoint para Eliminar
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.ownersService.remove(id);
