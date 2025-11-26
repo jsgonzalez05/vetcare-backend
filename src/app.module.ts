@@ -9,6 +9,7 @@ import { PetsModule } from './pets/pets.module';
 import { VaccinesModule } from './vaccines/vaccines.module';
 import { VaccinationSchemesService } from './vaccination-schemes/vaccination-schemes.service';
 import { VaccinationSchemesModule } from './vaccination-schemes/vaccination-schemes.module';
+import { VeterinariesModule } from './veterinaries/veterinaries.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { VaccinationSchemesModule } from './vaccination-schemes/vaccination-sche
     TreatmentsModule,
     VaccinesModule,
     VaccinationSchemesModule,
+    VeterinariesModule,
   ],
   controllers: [],
   providers: [VaccinationSchemesService],
